@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phone Lock Magic App</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon-192.png">
+  <meta name="theme-color" content="#222">
+</head>
+<body>
+  <h1>🔒 Phone Lock Magic App</h1>
+  <p>This is a simple PWA to demonstrate phone lock magic functionality.</p>
+  <input type="text" id="pin" placeholder="Enter PIN" maxlength="6">
+  <button onclick="lockPhone()">Lock Phone</button>
+  <div id="status"></div>
+  <script>
+    function lockPhone() {
+      const pin = document.getElementById('pin').value;
+      const status = document.getElementById('status');
+      if (pin === '123456') {
+        status.textContent = '✅ Phone locked!';
+      } else {
+        status.textContent = '❌ Wrong PIN. Try again!';
+      }
+    }
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').then(() => {
+        console.log('Service Worker registered.');
+      });
+    }
+  </script>
+</body>
+</html>
