@@ -2,191 +2,166 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Phone Lock Screen</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#16161a">
+  <meta name="theme-color" content="#181826">
   <style>
     body {
-      background: #191926;
-      width: 100vw; min-height: 100vh;
-      margin: 0;
+      margin: 0; padding: 0;
+      width: 100vw; height: 100vh;
       font-family: 'Segoe UI', 'Roboto', 'Poppins', sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
       overflow: hidden;
+      background: url('https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=720&q=80') no-repeat center center fixed;
+      background-size: cover;
+      position: relative;
+      user-select: none;
     }
     .lock-container {
-      width: 100vw; min-height: 100vh;
+      width: 100vw; height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
-      position: relative;
+      justify-content: center;
+      position: absolute;
+      z-index: 4;
+      top: 0; left: 0;
+      background: rgba(10, 12, 32, 0.55);
     }
-    .lock-time {
-      margin-top: 56px;
-      font-size: 2.16em;
-      color: #f6f6f8;
-      font-weight: 500;
+    .pin-label {
+      color: #bfc4e7;
+      font-size: 1.15em;
+      letter-spacing: 1.1px;
       text-align: center;
-      letter-spacing: 1.5px;
-      text-shadow: 0 2px 16px #0004;
-      user-select: none;
+      margin-bottom: 12px;
+      margin-top: 18px;
     }
     .pin-display {
-      margin-top: 42px;
-      margin-bottom: 12px;
-      min-height: 40px;
-      min-width: 120px;
-      text-align: center;
-      font-size: 2.12em;
-      font-family: 'Segoe UI', monospace;
-      color: #f2f2ff;
+      height: 44px;
+      min-width: 156px;
+      font-size: 2.1em;
+      color: #fff;
       letter-spacing: 14px;
-      background: rgba(30,30,43,0.74);
-      border-radius: 14px;
-      padding: 9px 8px 9px 8px;
-      box-shadow: 0 2px 18px #0007;
-      outline: none;
-      border: none;
-      width: 160px;
+      background: rgba(30,30,43,0.32);
+      border-radius: 13px;
+      padding: 8px 8px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 16px #0005;
       display: flex;
       align-items: center;
       justify-content: center;
       margin-left: auto;
       margin-right: auto;
-      transition: 0.2s background;
-    }
-    .pin-label {
-      text-align: center;
-      font-size: 1.12em;
-      color: #ababc6;
-      margin-bottom: 7px;
-      margin-top: 6px;
-      letter-spacing: 1.2px;
-      user-select: none;
     }
     .error-msg {
       color: #ff4b7a;
-      text-shadow: 0 1px 4px #000a;
-      font-size: 1.13em;
+      text-shadow: 0 1px 4px #0009;
+      font-size: 1.16em;
       min-height: 28px;
-      margin-top: 8px;
+      margin-bottom: 7px;
       text-align: center;
     }
     .num-pad {
       display: grid;
-      grid-template-columns: repeat(3, 72px);
-      grid-gap: 17px;
+      grid-template-columns: repeat(3, 76px);
+      grid-gap: 22px;
       justify-content: center;
-      margin: 36px 0 13px 0;
+      margin: 38px 0 18px 0;
     }
     .num-btn {
-      font-size: 2.1em;
-      background: #262637;
-      color: #f7f7fb;
+      font-size: 2.2em;
+      font-weight: 500;
+      background: rgba(32,32,56,0.40);
+      color: #ebf6ff;
       border: none;
       border-radius: 50%;
-      width: 72px; height: 62px;
-      box-shadow: 0 2px 18px #0007;
+      width: 76px; height: 66px;
       margin: 0;
       cursor: pointer;
       outline: none;
-      transition: 0.16s;
+      box-shadow: 0 4px 18px #0006;
       font-family: inherit;
+      opacity: 0.91;
+      transition: 0.15s;
       user-select: none;
-      position: relative;
     }
     .num-btn:active {
-      background: #34344c;
+      background: rgba(59,54,76,0.72);
     }
     .ok-btn {
       grid-column: 1 / span 3;
-      background: #50e5b4;
-      color: #17172b;
-      border-radius: 22px;
-      font-size: 1.16em;
-      margin-top: 13px;
-      letter-spacing: 1.3px;
-      box-shadow: 0 2px 16px #021;
-      height: 52px; width: 220px;
+      background: #47fac1;
+      color: #242a37;
+      border-radius: 23px;
+      font-size: 1.2em;
+      margin-top: 17px;
       font-weight: bold;
+      letter-spacing: 1.5px;
+      height: 56px; width: 238px;
       outline: none;
       border: none;
       cursor: pointer;
-      transition: 0.18s;
-      user-select: none;
-      position: relative;
+      box-shadow: 0 2px 14px #1a0a;
     }
-    .ok-btn:active { background: #50a4e8; color: #fff;}
-    /* Secret dot for magician */
+    .ok-btn:active { background: #36bdec; color: #fff;}
+    /* Emergency/Back */
+    .footer-bar {
+      display: flex;
+      width: 93vw;
+      justify-content: space-between;
+      align-items: center;
+      margin: 15px auto 0 auto;
+      color: #e0e0eb;
+      font-size: 1.07em;
+      opacity: 0.74;
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      user-select: none;
+    }
+    .footer-bar span {
+      padding: 0 5px;
+      font-size: 1.09em;
+    }
+    /* ultra-light magicians dot */
     .secret-dot {
       position: absolute;
-      top: 18px;
-      right: 22px;
-      width: 19px; height: 19px;
+      top: 13px; right: 17px;
+      width: 11px; height: 11px;
       border-radius: 50%;
-      background: radial-gradient(circle, #fed98c 70%, #16161a 100%);
-      cursor: pointer;
-      opacity: 0.10;
+      background: radial-gradient(circle, #fff8 55%, #16161a 110%);
+      opacity: 0.07;
       z-index: 222;
-      transition: opacity 0.2s;
+      cursor: pointer;
+      transition: opacity 0.10s;
     }
-    .secret-dot:hover {opacity: 0.19;}
+    .secret-dot:hover { opacity: .13; }
     .reveal {
-      color: #fffde0;
-      margin-top: 18px;
-      background: #333a;
-      padding: 8px 22px;
-      border-radius: 13px;
-      font-size: 1.13em;
-      letter-spacing: 2.1px;
-      box-shadow: 0 1px 10px #0002;
-      text-align: center;
+      color: #f7f7f7;
+      background: #181a36ec;
+      padding: 5px 18px;
+      border-radius: 8px;
+      font-size: 1.07em;
+      letter-spacing: 2px;
+      box-shadow: 0 1px 9px #0002;
       position: absolute;
-      top: 56px; right: 34px;
+      top: 37px; right: 32px;
       z-index: 999;
-      min-width: 112px;
+      min-width: 82px;
       display: none;
-    }
-    /* Home page (unlock) */
-    .home-page {
-      display: none;
-      position: fixed;
-      left: 0; top: 0; width: 100vw; height: 100vh;
-      background: linear-gradient(135deg, #fff5 0%, #1d1d28 95%);
-      align-items: center;
-      justify-content: center;
-      z-index: 999;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    .home-icon {
-      font-size: 3.2em;
-      margin: 24px 0 44px 0;
-      color: #1d153a;
-      text-shadow: 0 2px 22px #fff7;
+      font-family: inherit;
+      opacity: 0.95;
       text-align: center;
-      user-select: none;
     }
-    .home-text {
-      color: #1d153a;
-      font-size: 2em;
-      font-weight: 600;
-      text-align: center;
-      margin-bottom: 30px;
-      text-shadow: 0 2px 18px #fff7;
-      user-select: none;
+    @media (max-width: 540px) {
+      .num-pad {grid-template-columns: repeat(3, 1fr);}
+      .ok-btn {width: 92vw;}
+      .footer-bar {width: 98vw; font-size: 0.97em;}
     }
   </style>
 </head>
 <body>
 <div class="lock-container" id="lockScreen">
     <div class="secret-dot" title=" "></div>
-    <div class="lock-time" id="lockTime"></div>
     <div class="pin-label">Enter your PIN</div>
     <div class="pin-display" id="pinDisplay"></div>
     <div class="error-msg" id="errorMsg"></div>
@@ -200,34 +175,22 @@
       <button class="num-btn" onclick="pressNum('7')">7</button>
       <button class="num-btn" onclick="pressNum('8')">8</button>
       <button class="num-btn" onclick="pressNum('9')">9</button>
-      <button class="num-btn" onclick="pressNum('C')">&larr;</button>
+      <button class="num-btn" onclick="pressNum('C')">&#8592;</button>
       <button class="num-btn" onclick="pressNum('0')">0</button>
-      <button class="num-btn" onclick="pressNum('X')">×</button>
-      <button class="ok-btn" onclick="tryUnlock()">OK</button>
+      <button class="num-btn" onclick="pressNum('X')">&#10006;</button>
+      <button class="ok-btn" id="okBtn" onclick="tryUnlock()">OK</button>
+    </div>
+    <div class="footer-bar">
+      <span>EMERGENCY</span>
+      <span>Back</span>
     </div>
     <div class="reveal" id="revealPw"></div>
 </div>
-<div class="home-page" id="homePage">
-    <div class="home-icon">📱</div>
-    <div class="home-text">Home Screen<br>(Unlocked)</div>
-</div>
 <script>
-    // Time display logic
-    function updateTime() {
-      const now = new Date();
-      let h = now.getHours();
-      let m = now.getMinutes();
-      let ampm = '';
-      if(h === 0) h = 12;
-      if(h > 12) { ampm = ' PM'; h -= 12 } else { ampm = ' AM'; }
-      document.getElementById('lockTime').textContent =
-        (h<10?'0':'') + h + ':' + (m<10?'0':'') + m + ampm;
-    }
-    setInterval(updateTime, 1000); updateTime();
-    // Pin input and pad logic
-    let pinVal = ""; // Pin entered by audience
-    let audiencePassword = ""; // Saved for magician
+    let pinVal = "";
+    let audiencePassword = "";
     let secretMode = false, secretModeTimeout;
+
     function pressNum(val){
       if(val === 'C'){
         pinVal = pinVal.slice(0,-1);
@@ -239,34 +202,40 @@
       updatePinDisplay();
       document.getElementById('errorMsg').textContent="";
     }
+
     function updatePinDisplay(){
       document.getElementById('pinDisplay').textContent = pinVal.padStart(pinVal.length, ' ');
       document.getElementById('pinDisplay').style.justifyContent="center";
     }
-    // Always center for 4 or 6 digits, no left/right
-    // Aligns content center (visually) — PIN digits always centered.
-    // Unlock logic — Only 4 or 6 digits allowed, no others.
+
+    // No time!
+
+    // Unlock/app-cut logic
     function tryUnlock() {
-      if(!(pinVal.length===4 || pinVal.length===6)){
-         document.getElementById('errorMsg').textContent="Wrong Password!";
-         pinVal = "";
-         updatePinDisplay();
-         return;
-      }
-      audiencePassword = pinVal;
-      // Secret swipe unlock mode:
-      if(secretMode){
-        // Show home page, fullscreen unlock
-        document.getElementById('lockScreen').style.display='none';
-        document.getElementById('homePage').style.display='flex';
-        setTimeout(()=>{location.reload();}, 4000); // 4 seconds reset
+      if(secretMode) {
+        // After magician swipe: cut/app-exit mode
+        // Try window.close(); then blank; fallback to redirect
+        setTimeout(function(){
+          document.body.innerHTML = '';
+          window.close();
+          setTimeout(function(){
+            window.location.href = "about:blank";
+          }, 120);
+        }, 350);
         return;
       }
-      // Normal wrong password display
-      document.getElementById('errorMsg').textContent = "Wrong Password!";
-      pinVal = ""; updatePinDisplay();
+      // Normal pin input: save for magician (dot), wrong password
+      if(pinVal.length === 4 || pinVal.length === 6){
+        audiencePassword = pinVal;
+        document.getElementById('errorMsg').textContent = "Wrong Password!";
+        pinVal = ""; updatePinDisplay();
+      } else {
+        document.getElementById('errorMsg').textContent="Wrong Password!";
+        pinVal = ""; updatePinDisplay();
+      }
     }
-    // Secret swipe detection (right to left)
+
+    // Secret swipe: left to right ONLY!
     let touchStartX = null, touchEndX = null;
     window.addEventListener('touchstart', function(e){
       if(e.changedTouches.length > 0){
@@ -276,38 +245,42 @@
     window.addEventListener('touchend', function(e){
       if(e.changedTouches.length > 0){
         touchEndX = e.changedTouches[0].clientX;
-        if(touchStartX-touchEndX > 80){
+        if(touchEndX-touchStartX > 80){
           activateSecretMode();
         }
       }
     }, false);
-    // Mouse drag for desktop demo
+    // For desktop: mouse drag
     let mouseDown = false, mouseDownX = 0;
     window.addEventListener('mousedown', (e)=>{
       mouseDown = true; mouseDownX = e.clientX;
     });
     window.addEventListener('mouseup', (e)=>{
-      if(mouseDown && mouseDownX-e.clientX>80){
+      if(mouseDown && e.clientX-mouseDownX>80){
         activateSecretMode();
       }
       mouseDown = false;
     });
+
     function activateSecretMode(){
       secretMode = true;
       if(secretModeTimeout) clearTimeout(secretModeTimeout);
-      secretModeTimeout = setTimeout(()=>{secretMode=false;},15000);
-      document.getElementById('lockScreen').style.boxShadow="0 0 22px 5px #8ffd93";
-      setTimeout(()=>{document.getElementById('lockScreen').style.boxShadow="";}, 550);
+      secretModeTimeout = setTimeout(()=>{secretMode=false;},20000);
+      document.getElementById('okBtn').blur();
+      document.body.style.boxShadow="0 0 32px 9px #32fdc1b2";
+      setTimeout(()=>{document.body.style.boxShadow="";}, 850);
     }
-    // Secret dot — magician only
+
+    // Magician Dot — ultra light & tiny
     document.querySelector('.secret-dot').addEventListener('click', function(){
       if(audiencePassword){
         document.getElementById('revealPw').style.display="block";
         document.getElementById('revealPw').textContent="Saved PIN: "+audiencePassword;
-        setTimeout(()=>{document.getElementById('revealPw').style.display="none";},3600);
+        setTimeout(()=>{document.getElementById('revealPw').style.display="none";},3400);
       }
     });
-    // For app like fullscreen (PWA)
+
+    // Register SW for PWA and install app option
     if('serviceWorker' in navigator){
       navigator.serviceWorker.register('sw.js');
     }
