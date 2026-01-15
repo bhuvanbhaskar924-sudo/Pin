@@ -1,18 +1,43 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Bhuvan Bhaskar</title>
+  <title>Kung Fu Bhuvan</title>
+  <style>
+    body {
+      background: black;
+      color: white;
+      text-align: center;
+      font-family: Arial;
+    }
+
+    h1 {
+      color: yellow;
+    }
+
+    .fighter {
+      font-size: 80px;
+      animation: kungfu 1s infinite alternate;
+    }
+
+    @keyframes kungfu {
+      0% {
+        transform: translateX(-30px) rotate(0deg);
+      }
+      50% {
+        transform: translateX(30px) rotate(10deg);
+      }
+      100% {
+        transform: translateX(-30px) rotate(-10deg);
+      }
+    }
+  </style>
 </head>
 <body>
 
-  <h1>Bhuvan Bhaskar</h1>
-  <h2>Best Magician in the World</h2>
+  <h1>🥋 Bhuvan Kung Fu Show 🥋</h1>
+  <p>Do baad mein fighter kung fu karta dikhega 😎</p>
 
-  <p>Its magic is great & enjoyable.</p>
-
-  <p style="color:red;">
-    Welcome to my magic world 🔮
-  </p>
+  <div class="fighter">🤜💥🤛</div>
 
 </body>
 </html>
