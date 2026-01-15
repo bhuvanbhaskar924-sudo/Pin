@@ -1,43 +1,214 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Kung Fu Bhuvan</title>
-  <style>
-    body {
-      background: black;
-      color: white;
-      text-align: center;
-      font-family: Arial;
-    }
-
-    h1 {
-      color: yellow;
-    }
-
-    .fighter {
-      font-size: 80px;
-      animation: kungfu 1s infinite alternate;
-    }
-
-    @keyframes kungfu {
-      0% {
-        transform: translateX(-30px) rotate(0deg);
-      }
-      50% {
-        transform: translateX(30px) rotate(10deg);
-      }
-      100% {
-        transform: translateX(-30px) rotate(-10deg);
-      }
-    }
-  </style>
+<title>Bhuvan Runner Game</title>
+<style>
+body{
+  margin:0;
+  overflow:hidden;
+  background:#000;
+  font-family:Arial;
+}
+canvas{
+  display:block;
+  background:linear-gradient(#5ec6ff,#dff3ff);
+}
+#ui{
+  position:fixed;
+  top:10px;
+  left:10px;
+  color:white;
+  font-size:20px;
+  z-index:10;
+}
+#gameOver{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.7);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  color:white;
+  font-size:40px;
+}
+button{
+  padding:10px 20px;
+  font-size:20px;
+  margin-top:20px;
+}
+</style>
 </head>
 <body>
 
-  <h1>🥋 Bhuvan Kung Fu Show 🥋</h1>
-  <p>Do baad mein fighter kung fu karta dikhega 😎</p>
+<div id="ui">Score: 0 | High: 0</div>
+<div id="gameOver">
+  <div>GAME OVER 😡</div>
+  <button onclick="restart()">Restart</button>
+</div>
 
-  <div class="fighter">🤜💥🤛</div>
+<canvas id="game"></canvas>
 
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+let score=0;
+let high=0;
+let speed=6;
+let gravity=1;
+let ground=canvas.height-100;
+
+let player={
+  x:100,
+  y:ground-60,
+  w:50,
+  h:60,
+  dy:0,
+  jump:-22,
+  onGround:true
+};
+
+let obstacles=[];
+let coins=[];
+let gameOver=false;
+
+// Touch swipe system
+let touchStartY=0;
+document.addEventListener("touchstart",e=>{
+  touchStartY=e.touches[0].clientY;
+});
+document.addEventListener("touchend",e=>{
+  let touchEndY=e.changedTouches[0].clientY;
+  if(touchStartY-touchEndY>50){
+    jump();
+  }
+});
+
+// PC jump also
+document.addEventListener("keydown",e=>{
+  if(e.code=="Space") jump();
+});
+
+function jump(){
+  if(player.onGround){
+    player.dy=player.jump;
+    player.onGround=false;
+  }
+}
+
+function createObstacle(){
+  let size=40+Math.random()*40;
+  obstacles.push({
+    x:canvas.width,
+    y:ground-size,
+    w:size,
+    h:size
+  });
+}
+
+function createCoin(){
+  coins.push({
+    x:canvas.width,
+    y:ground-150-Math.random()*100,
+    r:12
+  });
+}
+
+function update(){
+  if(gameOver) return;
+
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // Ground
+  ctx.fillStyle="#3b7";
+  ctx.fillRect(0,ground,canvas.width,100);
+
+  // Player
+  ctx.fillStyle="yellow";
+  ctx.fillRect(player.x,player.y,player.w,player.h);
+
+  player.dy+=gravity;
+  player.y+=player.dy;
+
+  if(player.y+player.h>=ground){
+    player.y=ground-player.h;
+    player.dy=0;
+    player.onGround=true;
+  }
+
+  // Obstacles
+  ctx.fillStyle="red";
+  obstacles.forEach((o,i)=>{
+    o.x-=speed;
+    ctx.fillRect(o.x,o.y,o.w,o.h);
+
+    if(
+      player.x<o.x+o.w &&
+      player.x+player.w>o.x &&
+      player.y<o.y+o.h &&
+      player.y+player.h>o.y
+    ){
+      endGame();
+    }
+
+    if(o.x+o.w<0) obstacles.splice(i,1);
+  });
+
+  // Coins
+  ctx.fillStyle="gold";
+  coins.forEach((c,i)=>{
+    c.x-=speed;
+    ctx.beginPath();
+    ctx.arc(c.x,c.y,c.r,0,Math.PI*2);
+    ctx.fill();
+
+    let dx=player.x+player.w/2-c.x;
+    let dy=player.y+player.h/2-c.y;
+    if(Math.sqrt(dx*dx+dy*dy)<30){
+      score+=50;
+      coins.splice(i,1);
+    }
+
+    if(c.x<0) coins.splice(i,1);
+  });
+
+  // Random spawn
+  if(Math.random()<0.02) createObstacle();
+  if(Math.random()<0.015) createCoin();
+
+  score++;
+  speed+=0.0005;
+
+  document.getElementById("ui").innerText =
+   "Score: "+score+" | High: "+high;
+
+  requestAnimationFrame(update);
+}
+
+function endGame(){
+  gameOver=true;
+  if(score>high) high=score;
+  document.getElementById("gameOver").style.display="flex";
+}
+
+function restart(){
+  score=0;
+  speed=6;
+  obstacles=[];
+  coins=[];
+  gameOver=false;
+  player.y=ground-player.h;
+  document.getElementById("gameOver").style.display="none";
+  update();
+}
+
+update();
+</script>
 </body>
 </html>
