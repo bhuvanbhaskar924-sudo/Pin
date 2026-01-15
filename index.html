@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bhaskar Run - Subway Style</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: black;
+  }
+  canvas {
+    display: block;
+  }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let W = canvas.width;
+let H = canvas.height;
+
+// Load images
+const runnerImg = new Image();
+runnerImg.src = "assets/runner.png";
+
+const trainImg = new Image();
+trainImg.src = "assets/train.png";
+
+const trackImg = new Image();
+trackImg.src = "assets/track.png";
+
+const bgImg = new Image();
+bgImg.src = "assets/bg.png";
+
+// Game variables
+let speed = 6;
+let gravity = 0.8;
+let jumpPower = -15;
+let score = 0;
+
+// Lanes
+const lanes = [
+  W/2 - 120,
+  W/2,
+  W/2 + 120
+];
+
+// Player
+let player = {
+  x: lanes[1],
+  y: H - 220,
+  width: 80,
+  height: 120,
+  vy: 0,
+  lane: 1,
+  jumping: false
+};
+
+// Obstacles
+let trains = [];
+
+function spawnTrain() {
+  let lane = Math.floor(Math.random() * 3);
+  trains.push({
+    x: lanes[lane],
+    y: -300,
+    width: 120,
+    height: 200,
+    lane: lane
+  });
+}
+
+// Background scroll
+let bgY = 0;
+let trackY = 0;
+
+// Controls (Swipe + Keyboard)
+let startX = 0;
+let startY = 0;
+
+window.addEventListener("touchstart", e => {
+  startX = e.touches[0].clientX;
+  startY = e.touches[0].clientY;
+});
+
+window.addEventListener("touchend", e => {
+  let endX = e.changedTouches[0].clientX;
+  let endY = e.changedTouches[0].clientY;
+
+  let dx = endX - startX;
+  let dy = endY - startY;
+
+  if (Math.abs(dx) > Math.abs(dy)) {
+    if (dx > 50 && player.lane < 2) {
+      player.lane++;
+      player.x = lanes[player.lane];
+    } else if (dx < -50 && player.lane > 0) {
+      player.lane--;
+      player.x = lanes[player.lane];
+    }
+  } else {
+    if (dy < -50 && !player.jumping) {
+      player.vy = jumpPower;
+      player.jumping = true;
+    }
+  }
+});
+
+// Keyboard (for PC)
+window.addEventListener("keydown", e => {
+  if (e.key === "ArrowLeft" && player.lane > 0) {
+    player.lane--;
+    player.x = lanes[player.lane];
+  }
+  if (e.key === "ArrowRight" && player.lane < 2) {
+    player.lane++;
+    player.x = lanes[player.lane];
+  }
+  if (e.key === "ArrowUp" && !player.jumping) {
+    player.vy = jumpPower;
+    player.jumping = true;
+  }
+});
+
+// Collision detection
+function collide(a, b) {
+  return (
+    a.x < b.x + b.width &&
+    a.x + a.width > b.x &&
+    a.y < b.y + b.height &&
+    a.y + a.height > b.y
+  );
+}
+
+// Game Loop
+function gameLoop() {
+  ctx.clearRect(0, 0, W, H);
+
+  // Background
+  bgY += speed / 3;
+  if (bgY >= H) bgY = 0;
+  ctx.drawImage(bgImg, 0, bgY - H, W, H);
+  ctx.drawImage(bgImg, 0, bgY, W, H);
+
+  // Track
+  trackY += speed;
+  if (trackY >= H) trackY = 0;
+  ctx.drawImage(trackImg, 0, trackY - H, W, H);
+  ctx.drawImage(trackImg, 0, trackY, W, H);
+
+  // Player gravity
+  player.vy += gravity;
+  player.y += player.vy;
+
+  if (player.y >= H - 220) {
+    player.y = H - 220;
+    player.vy = 0;
+    player.jumping = false;
+  }
+
+  // Draw Player
+  ctx.drawImage(runnerImg, player.x - player.width/2, player.y, player.width, player.height);
+
+  // Trains
+  for (let i = 0; i < trains.length; i++) {
+    trains[i].y += speed;
+    ctx.drawImage(trainImg, trains[i].x - trains[i].width/2, trains[i].y, trains[i].width, trains[i].height);
+
+    if (collide(
+      {x: player.x - player.width/2, y: player.y, width: player.width, height: player.height},
+      {x: trains[i].x - trains[i].width/2, y: trains[i].y, width: trains[i].width, height: trains[i].height}
+    )) {
+      alert("Game Over!\nScore: " + score);
+      location.reload();
+    }
+  }
+
+  // Remove off-screen trains
+  trains = trains.filter(t => t.y < H + 200);
+
+  // Score
+  score++;
+  ctx.fillStyle = "white";
+  ctx.font = "24px Arial";
+  ctx.fillText("Score: " + score, 20, 40);
+
+  requestAnimationFrame(gameLoop);
+}
+
+// Spawn trains repeatedly
+setInterval(spawnTrain, 1800);
+
+// Start game
+gameLoop();
+</script>
+</body>
+</html>
